@@ -11,6 +11,8 @@ Role: Software Developer
 - Spring Boot 4.0.8
 - Spring Web MVC
 - Spring Data JPA
+- Spring Security
+- JWT (JSON Web Token) authentication
 - PostgreSQL
 - Flyway
 - Springdoc OpenAPI
@@ -19,7 +21,7 @@ Role: Software Developer
 
 ## Project Overview
 
-This project is structured as a monolith, which means all backend logic is organized within a single application. The current codebase focuses on user and role management, database migrations, and REST API readiness.
+This project is structured as a monolith, which means all backend logic is organized within a single application. The current codebase focuses on user and role management, database migrations, and API services, with authentication and authorization being handled using Spring Security and JWT.
 
 ## Architecture
 
@@ -53,9 +55,29 @@ backend/
 - JPA repositories for persistence
 - Service layer for business logic
 - REST controllers for API endpoints
+- Spring Security integration
+- JWT-based authentication and authorization
 - Flyway database migration support
 - OpenAPI/Swagger UI integration
 - Actuator health and monitoring endpoints
+
+## Authentication & Security
+
+This application will use Spring Security for authentication and authorization, with JWT tokens for stateless API security.
+
+Typical flow:
+
+- User registers or logs in
+- Server validates credentials
+- JWT token is generated and returned to the client
+- Client sends the token in the Authorization header
+- Spring Security validates the token for protected endpoints
+
+Example header:
+
+```http
+Authorization: Bearer <jwt-token>
+```
 
 ## Prerequisites
 
@@ -112,7 +134,8 @@ src/main/resources/db/migration/
 
 - This repository currently follows a monolithic backend design.
 - It is ready for expansion into separate services later if the project grows.
-- Security is currently not enabled in the main dependencies, but the app is structured for future extension.
+- Spring Security is integrated with JWT-based authentication for secure access control.
+- The app is structured for future extension and additional role-based authorization.
 
 ## License
 
