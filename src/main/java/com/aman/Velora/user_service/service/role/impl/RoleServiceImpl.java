@@ -64,6 +64,19 @@ public class RoleServiceImpl implements RoleService {
     }
 
     @Override
+    public RoleResponseDTO getRoleById(UUID roleId) {
+        Role role = roleRepository.findByIdAndIsActiveTrue(roleId).orElseThrow(() ->
+                new RoleNotFoundException("Role not found"));
+        log.info("Getting role by id: {}", role.getId());
+        return RoleDTOMapper.mapToRoleResponse(role);
+    }
+
+    @Override
+    public RoleResponseDTO updateRoleById(UUID roleId, RoleRequestDTO roleRequestDTO) {
+        return null;
+    }
+
+    @Override
     public void deleteRole(UUID id) {
         Role role = roleRepository.findById(id).orElseThrow(() ->
                 new RoleNotFoundException("Role not found with this ID"));

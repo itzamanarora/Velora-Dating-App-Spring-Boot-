@@ -11,5 +11,9 @@ public interface RoleService {
 
     PageResponseDTO<RoleResponseDTO> getAllRoles(int page, int pageSize, String sortBy, String search);
 
+    RoleResponseDTO getRoleById(UUID roleId);
+
+    RoleResponseDTO updateRoleById(UUID roleId, RoleRequestDTO roleRequestDTO);
+
     void deleteRole(UUID id);
 }
