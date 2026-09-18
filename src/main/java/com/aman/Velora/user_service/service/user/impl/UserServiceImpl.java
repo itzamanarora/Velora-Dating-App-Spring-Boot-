@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService {
 
         Page<UserResponseDTO> userPage;
 
-        if (search == null && search.isEmpty())
+        if (search == null || search.isEmpty())
             userPage = userRepository.findAll(pageable).map(UserDTOMapper::mapToUserResponse);
         else
             userPage = userRepository.findByEmailContainingIgnoreCase(search, pageable).map(UserDTOMapper::mapToUserResponse);
