@@ -15,6 +15,8 @@ public interface RoleRepository extends JpaRepository<Role, UUID> {
 
     Optional<Role> findByIdAndIsActiveTrue(UUID roleId);
 
+    Optional<Role> findByNameIgnoreCaseAndIsActiveTrue(String name);
+
     Page<Role> findByNameContainingIgnoreCaseAndIsActiveTrueOrDisplayNameContainingIgnoreCaseAndIsActiveTrue(
             String name, String displayName, Pageable pageable
     );

@@ -5,6 +5,7 @@ import com.aman.Velora.user_service.dto.role.RoleRequestDTO;
 import com.aman.Velora.user_service.dto.role.RoleResponseDTO;
 import com.aman.Velora.user_service.service.role.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,7 +24,7 @@ public class RoleController {
     }
 
     @PostMapping
-    public ResponseEntity<RoleResponseDTO> createRole(@RequestBody RoleRequestDTO roleRequestDTO) {
+    public ResponseEntity<RoleResponseDTO> createRole(@Valid @RequestBody RoleRequestDTO roleRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(roleService.createRole(roleRequestDTO));
     }

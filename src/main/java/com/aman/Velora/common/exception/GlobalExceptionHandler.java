@@ -1,7 +1,9 @@
-package com.aman.Velora.user_service.exception;
+package com.aman.Velora.common.exception;
 
+import com.aman.Velora.auth_service.exception.auth.InvalidCredentialsException;
 import com.aman.Velora.user_service.exception.role.RoleAlreadyInactiveException;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
+import com.aman.Velora.user_service.exception.user.UserAlreadyExistsException;
 import com.aman.Velora.user_service.exception.user.UserNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -82,9 +84,35 @@ public class GlobalExceptionHandler {
                 .body(
                         ErrorResponse.builder()
                                 .timestamp(Instant.now())
-                                .status(HttpStatus.CONFLICT.value())
+                                .status(HttpStatus.NOT_FOUND.value())
                                 .message(exception.getMessage())
                                 .code("USER_NOT_FOUND")
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException exception) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(
+                        ErrorResponse.builder()
+                                .timestamp(Instant.now())
+                                .status(HttpStatus.CONFLICT.value())
+                                .message(exception.getMessage())
+                                .code("USER_ALREADY_EXISTS")
+                                .build()
+                );
+    }
+
+    @ExceptionHandler(InvalidCredentialsException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCredentials(InvalidCredentialsException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ErrorResponse.builder()
+                                .timestamp(Instant.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .message(exception.getMessage())
+                                .code("BAD_REQUEST")
                                 .build()
                 );
     }
