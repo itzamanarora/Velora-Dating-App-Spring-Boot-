@@ -1,9 +1,10 @@
-package com.aman.Velora.auth_service.security.impl;
+package com.aman.Velora.auth_service.service.impl;
 
 import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
 import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
 import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
-import com.aman.Velora.auth_service.security.AuthService;
+import com.aman.Velora.auth_service.service.AuthService;
+import com.aman.Velora.auth_service.service.JwtService;
 import com.aman.Velora.user_service.dto.user.UserResponseDTO;
 import com.aman.Velora.auth_service.exception.auth.InvalidCredentialsException;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
@@ -20,13 +21,26 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    public AuthServiceImpl(
+            UserRepository userRepository,
+            RoleRepository roleRepository,
+            PasswordEncoder passwordEncoder,
+            JwtService jwtService
+    ) {
+        this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
+    }
+
 
     @Override
     @Transactional
@@ -58,14 +72,20 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByEmail(loginRequestDTO.getEmail().trim())
                 .orElseThrow(InvalidCredentialsException::new);
 
-        boolean passwordHash = passwordEncoder.matches(user.getPassword(), loginRequestDTO.getPassword());
+        boolean isPasswordValid = passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword());
 
-        if (!passwordHash) throw new InvalidCredentialsException("Incorrect password.");
+        if (!isPasswordValid) throw new InvalidCredentialsException();
+
+        String accessToken = jwtService.generateToken(user);
 
         log.info("User Logged in: {}", user.getEmail());
 
-        return null;
+        return AuthResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken("in-progress")
+                .tokenType("bearer")
+                .expiresIn(1231231)
+                .build();
     }
-
 
 }
