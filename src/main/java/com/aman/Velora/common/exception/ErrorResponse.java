@@ -1,4 +1,4 @@
-package com.aman.Velora.user_service.exception;
+package com.aman.Velora.common.exception;
 
 import lombok.*;
 

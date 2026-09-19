@@ -4,12 +4,15 @@ import com.aman.Velora.user_service.dto.page.PageResponseDTO;
 import com.aman.Velora.user_service.dto.role.RoleRequestDTO;
 import com.aman.Velora.user_service.dto.role.RoleResponseDTO;
 import com.aman.Velora.user_service.service.role.RoleService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@Tag(name = "Role APIs Endpoint")
 @RestController
 @RequestMapping("/api/v1/role")
 public class RoleController {
@@ -21,7 +24,7 @@ public class RoleController {
     }
 
     @PostMapping
-    public ResponseEntity<RoleResponseDTO> createRole(@RequestBody RoleRequestDTO roleRequestDTO) {
+    public ResponseEntity<RoleResponseDTO> createRole(@Valid @RequestBody RoleRequestDTO roleRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(roleService.createRole(roleRequestDTO));
     }
@@ -34,6 +37,11 @@ public class RoleController {
             @RequestParam(required = false) String search
     ) {
         return ResponseEntity.ok(roleService.getAllRoles(page, pageSize, sortBy, search));
+    }
+
+    @GetMapping("/{roleId}")
+    public ResponseEntity<RoleResponseDTO> getRoleById(@PathVariable UUID roleId) {
+        return ResponseEntity.ok(roleService.getRoleById(roleId));
     }
 
     @DeleteMapping("/{roleId}")
