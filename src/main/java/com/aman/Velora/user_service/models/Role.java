@@ -33,6 +33,7 @@ public class Role {
     @Column(name = "display_name", unique = true, nullable = false, length = 75)
     private String displayName;
 
+    @Builder.Default
     @Column(name = "is_active", nullable = false)
     private boolean isActive = true;
 

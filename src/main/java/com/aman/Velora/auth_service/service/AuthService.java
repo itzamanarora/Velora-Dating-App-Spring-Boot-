@@ -1,4 +1,4 @@
-package com.aman.Velora.auth_service.security;
+package com.aman.Velora.auth_service.service;
 
 import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
 import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
