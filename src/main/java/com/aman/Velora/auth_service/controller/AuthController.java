@@ -3,6 +3,7 @@ package com.aman.Velora.auth_service.controller;
 import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
 import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
 import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
+import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
 import com.aman.Velora.auth_service.service.AuthService;
 import com.aman.Velora.user_service.dto.user.UserResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,7 +27,7 @@ public class AuthController {
     }
 
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
+    public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.signup(signupRequestDTO));
     }

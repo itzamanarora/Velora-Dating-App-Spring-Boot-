@@ -18,7 +18,7 @@ public class TestMailController {
 
     @PostMapping("/send-mail")
     public String sendTestMail(@RequestParam String email) {
-        otpService.sendTestEmail(email);
+//        otpService.sendTestEmail(email);
         return "Email send to " + email;
     }
 }
