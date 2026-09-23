@@ -30,7 +30,7 @@ public class User {
     @Column(unique = true, nullable = false, length = 255)
     private String email;
 
-    @Column(nullable = false)
+    @Column(name = "password_hash", nullable = false)
     private String password;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -40,6 +40,10 @@ public class User {
             foreignKey = @ForeignKey(name = "fk_user_role")
     )
     private Role role;
+
+    @Builder.Default
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified = false;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

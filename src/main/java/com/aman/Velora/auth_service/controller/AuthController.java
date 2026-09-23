@@ -1,20 +1,19 @@
 package com.aman.Velora.auth_service.controller;
 
-import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
-import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
+import com.aman.Velora.auth_service.dto.request.*;
 import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
+import com.aman.Velora.auth_service.dto.response.ForgotPasswordResponseDTO;
+import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
+import com.aman.Velora.auth_service.dto.response.VerifyOTPResponseDTO;
 import com.aman.Velora.auth_service.service.AuthService;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "Auth APIs Endpoint")
+@Tag(name = "Auth APIs Endpoint", description = "Signup, login, OTP verification and password reset")
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -25,8 +24,12 @@ public class AuthController {
         this.authService = authService;
     }
 
+    @Operation(
+            summary = "Register a new user",
+            description = "Creates an unverified account and sends an OTP to the given email for verification."
+    )
     @PostMapping("/signup")
-    public ResponseEntity<UserResponseDTO> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
+    public ResponseEntity<SignupResponseDTO> signup(@Valid @RequestBody SignupRequestDTO signupRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(authService.signup(signupRequestDTO));
     }
@@ -34,5 +37,20 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@Valid @RequestBody LoginRequestDTO loginRequestDTO) {
         return ResponseEntity.ok(authService.login(loginRequestDTO));
+    }
+
+    @PostMapping("/verify-otp")
+    public ResponseEntity<VerifyOTPResponseDTO> verifyOtp(@Valid @RequestBody VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        return ResponseEntity.ok(authService.verifyEmailOTP(verifyOTPRequestDTO));
+    }
+
+    @PostMapping("/forget-passwod")
+    public ResponseEntity<ForgotPasswordResponseDTO> forgetPassword(@Valid @RequestBody ForgotPasswordRequestDTO forgotPasswordRequestDTO) {
+        return ResponseEntity.ok(authService.forgotPassword(forgotPasswordRequestDTO));
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<ForgotPasswordResponseDTO> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO) {
+        return ResponseEntity.ok(authService.resetPassword(resetPasswordRequestDTO));
     }
 }

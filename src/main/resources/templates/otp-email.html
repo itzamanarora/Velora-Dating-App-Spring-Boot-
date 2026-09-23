@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body style="margin:0; padding:0; background-color:#f4f4f7; font-family: Arial, sans-serif;">
+<table cellpadding="0" cellspacing="0" style="padding: 40px 0;" width="100%">
+    <tr>
+        <td align="center">
+            <table cellpadding="0" cellspacing="0" style="background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 8px rgba(0,0,0,0.08);"
+                   width="480">
+                <tr>
+                    <td style="padding: 32px; text-align:center; background-color:#4f46e5;">
+                        <h1 style="color:#ffffff; margin:0; font-size:22px;">Velora</h1>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 32px;">
+                        <h2 style="margin-top:0; color:#111827; font-size:20px;" th:text="${title}">Verify your
+                            email</h2>
+                        <p style="color:#4b5563; font-size:15px; line-height:1.5;" th:text="${message}">
+                            Use the code below to continue.
+                        </p>
+                        <div style="text-align:center; margin: 28px 0;">
+                                <span style="display:inline-block; font-size:32px; letter-spacing:8px; font-weight:bold; color:#111827; background:#f3f4f6; padding:16px 24px; border-radius:8px;"
+                                      th:text="${otpCode}">123456</span>
+                        </div>
+                        <p style="color:#9ca3af; font-size:13px;">
+                            This code will expire in <span th:text="${expiryMinutes}">10</span> minutes.
+                            If you didn't request this, you can safely ignore this email.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 20px 32px; background-color:#f9fafb; text-align:center;">
+                        <p style="color:#9ca3af; font-size:12px; margin:0;">© 2026 Velora. All rights reserved.</p>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

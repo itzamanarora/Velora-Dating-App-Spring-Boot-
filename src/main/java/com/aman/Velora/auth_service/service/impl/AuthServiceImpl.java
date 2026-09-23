@@ -1,20 +1,22 @@
 package com.aman.Velora.auth_service.service.impl;
 
-import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
-import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
+import com.aman.Velora.auth_service.dto.request.*;
 import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
+import com.aman.Velora.auth_service.dto.response.ForgotPasswordResponseDTO;
+import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
+import com.aman.Velora.auth_service.dto.response.VerifyOTPResponseDTO;
+import com.aman.Velora.auth_service.exception.EmailNotVerifiedException;
+import com.aman.Velora.auth_service.models.OtpPurpose;
 import com.aman.Velora.auth_service.service.AuthService;
 import com.aman.Velora.auth_service.service.JwtService;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
-import com.aman.Velora.auth_service.exception.auth.InvalidCredentialsException;
+import com.aman.Velora.auth_service.service.OtpService;
+import com.aman.Velora.auth_service.exception.InvalidCredentialsException;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
 import com.aman.Velora.user_service.exception.user.UserAlreadyExistsException;
-import com.aman.Velora.user_service.mapper.UserDTOMapper;
 import com.aman.Velora.user_service.models.Role;
 import com.aman.Velora.user_service.models.User;
 import com.aman.Velora.user_service.repository.RoleRepository;
 import com.aman.Velora.user_service.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,23 +30,26 @@ public class AuthServiceImpl implements AuthService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
+    private final OtpService otpService;
 
     public AuthServiceImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
-            JwtService jwtService
+            JwtService jwtService,
+            OtpServiceImpl otpService
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
+        this.otpService = otpService;
     }
 
 
     @Override
     @Transactional
-    public UserResponseDTO signup(SignupRequestDTO signupRequestDTO) {
+    public SignupResponseDTO signup(SignupRequestDTO signupRequestDTO) {
         String email = signupRequestDTO.getEmail().trim();
 
         if (userRepository.findByEmail(email).isPresent()) {
@@ -62,9 +67,15 @@ public class AuthServiceImpl implements AuthService {
                 .build();
 
         User savedUser = userRepository.save(user);
+
+        otpService.generateAndSendOtp(savedUser, OtpPurpose.EMAIL_VERIFICATION);
+
         log.info("User signed up successfully with email: {}", savedUser.getEmail());
 
-        return UserDTOMapper.mapToUserResponse(savedUser);
+        return SignupResponseDTO.builder()
+                .message("Signup Successful! Please verify you email using the otp sent.")
+                .email(savedUser.getEmail())
+                .build();
     }
 
     @Override
@@ -75,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
         boolean isPasswordValid = passwordEncoder.matches(loginRequestDTO.getPassword(), user.getPassword());
 
         if (!isPasswordValid) throw new InvalidCredentialsException();
+        if (!user.isEmailVerified()) throw new EmailNotVerifiedException("Please verify your email before logging in.");
 
         String accessToken = jwtService.generateToken(user);
 
@@ -85,6 +97,61 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken("in-progress")
                 .tokenType("bearer")
                 .expiresIn(1231231)
+                .build();
+    }
+
+    @Override
+    public VerifyOTPResponseDTO verifyEmailOTP(VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        otpService.verifyOtp(
+                verifyOTPRequestDTO.getEmail().trim(),
+                verifyOTPRequestDTO.getOtp(),
+                OtpPurpose.EMAIL_VERIFICATION
+        );
+
+        User user = userRepository.findByEmail(verifyOTPRequestDTO.getEmail().trim())
+                .orElseThrow(InvalidCredentialsException::new);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        log.info("Email verified successfully for: {}", user.getEmail());
+
+        return VerifyOTPResponseDTO.builder()
+                .message("Email verified successfully. You can now log in.")
+                .build();
+    }
+
+    @Override
+    public ForgotPasswordResponseDTO forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO) {
+        userRepository.findByEmail(forgotPasswordRequestDTO.getEmail().trim())
+                .ifPresent(user -> {
+                    otpService.generateAndSendOtp(user, OtpPurpose.PASSWORD_RESET);
+                    log.info("Otp has been sent successfully on email: {}", user.getEmail());
+                });
+
+        return ForgotPasswordResponseDTO.builder()
+                .message("If an account exists with this email, a password reset OTP has been sent.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ForgotPasswordResponseDTO resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO) {
+        otpService.verifyOtp(
+                resetPasswordRequestDTO.getEmail().trim(),
+                resetPasswordRequestDTO.getOtp(),
+                OtpPurpose.PASSWORD_RESET
+        );
+
+        User user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail().trim())
+                .orElseThrow(InvalidCredentialsException::new);
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
+        userRepository.save(user);
+
+        log.info("Password has been updated successfully on email: {}", user.getEmail());
+
+        return ForgotPasswordResponseDTO.builder()
+                .message("Password reset successfully. You can now log in with your new password.")
                 .build();
     }
 

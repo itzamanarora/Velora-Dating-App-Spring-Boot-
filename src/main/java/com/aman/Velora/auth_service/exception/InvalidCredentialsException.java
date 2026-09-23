@@ -1,4 +1,4 @@
-package com.aman.Velora.auth_service.exception.auth;
+package com.aman.Velora.auth_service.exception;
 
 public class InvalidCredentialsException extends RuntimeException {
     public InvalidCredentialsException() {

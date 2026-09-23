@@ -1,6 +1,6 @@
 package com.aman.Velora.common.exception;
 
-import com.aman.Velora.auth_service.exception.auth.InvalidCredentialsException;
+import com.aman.Velora.auth_service.exception.InvalidCredentialsException;
 import com.aman.Velora.user_service.exception.role.RoleAlreadyInactiveException;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
 import com.aman.Velora.user_service.exception.user.UserAlreadyExistsException;
@@ -21,6 +21,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleInternalServerError(Exception exception) {
         log.error("Unexpected internal server error: {}", exception.getMessage());
+        exception.printStackTrace();
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(
