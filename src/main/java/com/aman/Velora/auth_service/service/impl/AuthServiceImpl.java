@@ -1,9 +1,10 @@
 package com.aman.Velora.auth_service.service.impl;
 
-import com.aman.Velora.auth_service.dto.request.LoginRequestDTO;
-import com.aman.Velora.auth_service.dto.request.SignupRequestDTO;
+import com.aman.Velora.auth_service.dto.request.*;
 import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
+import com.aman.Velora.auth_service.dto.response.ForgotPasswordResponseDTO;
 import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
+import com.aman.Velora.auth_service.dto.response.VerifyOTPResponseDTO;
 import com.aman.Velora.auth_service.exception.EmailNotVerifiedException;
 import com.aman.Velora.auth_service.models.OtpPurpose;
 import com.aman.Velora.auth_service.service.AuthService;
@@ -96,6 +97,61 @@ public class AuthServiceImpl implements AuthService {
                 .refreshToken("in-progress")
                 .tokenType("bearer")
                 .expiresIn(1231231)
+                .build();
+    }
+
+    @Override
+    public VerifyOTPResponseDTO verifyEmailOTP(VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        otpService.verifyOtp(
+                verifyOTPRequestDTO.getEmail().trim(),
+                verifyOTPRequestDTO.getOtp(),
+                OtpPurpose.EMAIL_VERIFICATION
+        );
+
+        User user = userRepository.findByEmail(verifyOTPRequestDTO.getEmail().trim())
+                .orElseThrow(InvalidCredentialsException::new);
+        user.setEmailVerified(true);
+        userRepository.save(user);
+
+        log.info("Email verified successfully for: {}", user.getEmail());
+
+        return VerifyOTPResponseDTO.builder()
+                .message("Email verified successfully. You can now log in.")
+                .build();
+    }
+
+    @Override
+    public ForgotPasswordResponseDTO forgotPassword(ForgotPasswordRequestDTO forgotPasswordRequestDTO) {
+        userRepository.findByEmail(forgotPasswordRequestDTO.getEmail().trim())
+                .ifPresent(user -> {
+                    otpService.generateAndSendOtp(user, OtpPurpose.PASSWORD_RESET);
+                    log.info("Otp has been sent successfully on email: {}", user.getEmail());
+                });
+
+        return ForgotPasswordResponseDTO.builder()
+                .message("If an account exists with this email, a password reset OTP has been sent.")
+                .build();
+    }
+
+    @Override
+    @Transactional
+    public ForgotPasswordResponseDTO resetPassword(ResetPasswordRequestDTO resetPasswordRequestDTO) {
+        otpService.verifyOtp(
+                resetPasswordRequestDTO.getEmail().trim(),
+                resetPasswordRequestDTO.getOtp(),
+                OtpPurpose.PASSWORD_RESET
+        );
+
+        User user = userRepository.findByEmail(resetPasswordRequestDTO.getEmail().trim())
+                .orElseThrow(InvalidCredentialsException::new);
+
+        user.setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
+        userRepository.save(user);
+
+        log.info("Password has been updated successfully on email: {}", user.getEmail());
+
+        return ForgotPasswordResponseDTO.builder()
+                .message("Password reset successfully. You can now log in with your new password.")
                 .build();
     }
 

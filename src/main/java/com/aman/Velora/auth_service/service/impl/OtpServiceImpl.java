@@ -1,5 +1,6 @@
 package com.aman.Velora.auth_service.service.impl;
 
+import com.aman.Velora.auth_service.exception.InvalidOtpException;
 import com.aman.Velora.auth_service.models.OtpPurpose;
 import com.aman.Velora.auth_service.models.OtpVerification;
 import com.aman.Velora.auth_service.repository.OtpVerificationRepository;
@@ -8,6 +9,8 @@ import com.aman.Velora.user_service.models.User;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,7 @@ import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
@@ -28,6 +32,8 @@ public class OtpServiceImpl implements OtpService {
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
     private final OtpVerificationRepository otpVerificationRepository;
+    @Value("${MAIL_FROM}")
+    private String MAIL_FROM;
 
     @Transactional
     @Override
@@ -65,6 +71,7 @@ public class OtpServiceImpl implements OtpService {
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(MAIL_FROM);
             helper.setTo(toEmail);
             helper.setSubject(purpose == OtpPurpose.EMAIL_VERIFICATION ? "Verify you velora Account" : "Reset your velora password");
             helper.setText(htmlBody, true); // true = isHtml
@@ -73,5 +80,29 @@ public class OtpServiceImpl implements OtpService {
         } catch (MessagingException e) {
             throw new RuntimeException("Failed to send email", e);
         }
+    }
+
+    @Override
+    @Transactional
+    public void verifyOtp(String email, String otpCode, OtpPurpose purpose) {
+        OtpVerification otpVerification = otpVerificationRepository.
+                findTopByUser_EmailAndPurposeAndIsUsedFalseOrderByCreatedAtDesc(
+                        email, purpose
+                ).orElseThrow(() -> new InvalidOtpException("No active OTP found"));
+
+        if (otpVerification.getExpiresAt().isBefore(Instant.now()))
+            throw new InvalidOtpException("OTP expired.");
+
+        if (otpVerification.getAttemptCount() >= 3)
+            throw new InvalidOtpException("Maximum attempt exceeded.");
+
+        if (!otpVerification.getOtpCode().equals(otpCode)) {
+            otpVerification.setAttemptCount((short) (otpVerification.getAttemptCount() + 1));
+            otpVerificationRepository.save(otpVerification);
+            throw new InvalidOtpException("Incorrect Otp!");
+        }
+        otpVerification.setUsed(true);
+        log.info("OTP is verified: {}", otpVerification.getId());
+        otpVerificationRepository.save(otpVerification);
     }
 }

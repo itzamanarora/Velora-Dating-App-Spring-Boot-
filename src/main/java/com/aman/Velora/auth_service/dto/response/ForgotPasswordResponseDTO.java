@@ -7,6 +7,6 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class VerifyOTPResponse {
-    String message;
+public class ForgotPasswordResponseDTO {
+    private String message;
 }
