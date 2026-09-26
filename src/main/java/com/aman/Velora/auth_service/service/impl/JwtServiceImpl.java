@@ -1,5 +1,7 @@
 package com.aman.Velora.auth_service.service.impl;
 
+import com.aman.Velora.auth_service.models.RefreshToken;
+import com.aman.Velora.auth_service.repository.RefreshTokenRepository;
 import com.aman.Velora.auth_service.service.JwtService;
 import com.aman.Velora.user_service.models.User;
 import io.jsonwebtoken.JwtException;
@@ -16,12 +18,14 @@ import java.util.UUID;
 public class JwtServiceImpl implements JwtService {
 
     private final SecretKey secretKey;
-
+    private final RefreshTokenRepository refreshTokenRepository;
     @Value("${jwt.access-token-expiration}")
     private long accessTokenExpiation;
 
-    public JwtServiceImpl(SecretKey secretKey) {
+    public JwtServiceImpl(SecretKey secretKey,
+                          RefreshTokenRepository refreshTokenRepository) {
         this.secretKey = secretKey;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
@@ -59,5 +63,20 @@ public class JwtServiceImpl implements JwtService {
                 .getPayload()
                 .getSubject();
         return UUID.fromString(userId);
+    }
+
+    @Override
+    public long getExpirationTime() {
+        return accessTokenExpiation / 1000; // Convert milliseconds to seconds
+    }
+
+    @Override
+    public RefreshToken generateRefreshToken(User user) {
+        RefreshToken refreshToken = RefreshToken.builder()
+                .user(user)
+                .token(UUID.randomUUID().toString())
+                .expiresAt(Instant.now().plusSeconds(7 * 24 * 60 * 60)) // 7 days
+                .build();
+        return refreshTokenRepository.save(refreshToken);
     }
 }

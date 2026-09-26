@@ -1,5 +1,6 @@
 package com.aman.Velora.auth_service.models;
 
+import com.aman.Velora.user_service.models.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -21,8 +22,13 @@ public class RefreshToken {
     @Column(nullable = false, updatable = false)
     private UUID id;
 
-    @Column(name = "user_id", nullable = false)
-    private UUID userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "user_id",
+            nullable = false,
+            updatable = false
+    )
+    private User user;
 
     @Column(name = "token", nullable = false, updatable = false, unique = true)
     private String token;

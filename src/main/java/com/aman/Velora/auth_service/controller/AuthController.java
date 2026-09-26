@@ -1,10 +1,7 @@
 package com.aman.Velora.auth_service.controller;
 
 import com.aman.Velora.auth_service.dto.request.*;
-import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
-import com.aman.Velora.auth_service.dto.response.ForgotPasswordResponseDTO;
-import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
-import com.aman.Velora.auth_service.dto.response.VerifyOTPResponseDTO;
+import com.aman.Velora.auth_service.dto.response.*;
 import com.aman.Velora.auth_service.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,5 +49,15 @@ public class AuthController {
     @PostMapping("/reset-password")
     public ResponseEntity<ForgotPasswordResponseDTO> resetPassword(@Valid @RequestBody ResetPasswordRequestDTO resetPasswordRequestDTO) {
         return ResponseEntity.ok(authService.resetPassword(resetPasswordRequestDTO));
+    }
+
+    @PostMapping("/resend-otp")
+    public ResponseEntity<ResendOTPResponseDTO> resentOtp(@Valid @RequestBody ResendOTPRequestDTO resendOTPRequestDTO) {
+        return ResponseEntity.ok(authService.resendOtp(resendOTPRequestDTO));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
+        return ResponseEntity.ok(authService.refreshToken(refreshTokenRequestDTO));
     }
 }
