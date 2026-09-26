@@ -30,8 +30,6 @@ import java.time.Instant;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
-    private final OtpVerificationRepository otpVerificationRepository;
-
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
@@ -44,14 +42,12 @@ public class AuthServiceImpl implements AuthService {
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             OtpServiceImpl otpService,
-            OtpVerificationRepository otpVerificationRepository,
             RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.otpService = otpService;
-        this.otpVerificationRepository = otpVerificationRepository;
         this.refreshTokenRepository = refreshTokenRepository;
     }
 
@@ -157,6 +153,7 @@ public class AuthServiceImpl implements AuthService {
 
         user.setPassword(passwordEncoder.encode(resetPasswordRequestDTO.getNewPassword()));
         userRepository.save(user);
+        refreshTokenRepository.deleteByUserId(user.getId());
 
         log.info("Password has been updated successfully on email: {}", user.getEmail());
 
