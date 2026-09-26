@@ -38,6 +38,7 @@ public class OtpServiceImpl implements OtpService {
     @Transactional
     @Override
     public void generateAndSendOtp(User user, OtpPurpose purpose) {
+        log.info("Generating OTP for user: {} with purpose: {}", user.getEmail(), purpose);
         String otpCode = generateSecureOtp();
 
         OtpVerification otpVerification = OtpVerification.builder()
@@ -49,6 +50,7 @@ public class OtpServiceImpl implements OtpService {
 
         otpVerificationRepository.save(otpVerification);
         sendOtpEmail(user.getEmail(), otpCode, purpose);
+        log.info("OTP generated and sent to user: {} with purpose: {}", user.getEmail(), purpose);
     }
 
     @Override

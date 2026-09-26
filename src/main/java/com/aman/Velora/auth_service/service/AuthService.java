@@ -17,4 +17,6 @@ public interface AuthService {
     ResendOTPResponseDTO resendOtp(ResendOTPRequestDTO resendOTPRequestDTO);
 
     RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO refreshTokenRequestDTO);
+
+    SignOutResponseDTO signOut(SignOutRequestDTO signOutRequestDTO);
 }

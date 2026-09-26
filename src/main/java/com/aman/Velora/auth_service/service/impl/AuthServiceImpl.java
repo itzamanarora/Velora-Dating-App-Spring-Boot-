@@ -85,6 +85,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
+        log.info("Login attempt for email: {}", loginRequestDTO.getEmail().trim());
+
         User user = userRepository.findByEmail(loginRequestDTO.getEmail().trim())
                 .orElseThrow(InvalidCredentialsException::new);
 
@@ -108,6 +110,8 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public VerifyOTPResponseDTO verifyEmailOTP(VerifyOTPRequestDTO verifyOTPRequestDTO) {
+        log.info("Verifying OTP for email: {}", verifyOTPRequestDTO.getEmail().trim());
+
         otpService.verifyOtp(
                 verifyOTPRequestDTO.getEmail().trim(),
                 verifyOTPRequestDTO.getOtp(),
@@ -164,6 +168,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public ResendOTPResponseDTO resendOtp(ResendOTPRequestDTO resendOTPRequestDTO) {
+        log.info("Resending OTP for email: {}", resendOTPRequestDTO.getEmail().trim());
         User user = userRepository.findByEmail(resendOTPRequestDTO.getEmail().trim())
                 .orElseThrow(InvalidCredentialsException::new);
 
@@ -195,6 +200,19 @@ public class AuthServiceImpl implements AuthService {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getToken())
                 .expiresIn(jwtService.getExpirationTime())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public SignOutResponseDTO signOut(SignOutRequestDTO signOutRequestDTO) {
+        log.info("Signing out user with refresh token: {}", signOutRequestDTO.getRefreshToken());
+
+        refreshTokenRepository.deleteByToken(signOutRequestDTO.getRefreshToken());
+
+        log.info("User signed out successfully.");
+        return SignOutResponseDTO.builder()
+                .message("Signed out successfully.")
                 .build();
     }
 

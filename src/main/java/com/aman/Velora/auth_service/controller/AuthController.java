@@ -60,4 +60,9 @@ public class AuthController {
     public ResponseEntity<RefreshTokenResponseDTO> refreshToken(@Valid @RequestBody RefreshTokenRequestDTO refreshTokenRequestDTO) {
         return ResponseEntity.ok(authService.refreshToken(refreshTokenRequestDTO));
     }
+
+    @PostMapping("/signout")
+    public ResponseEntity<SignOutResponseDTO> signout(@Valid @RequestBody SignOutRequestDTO signOutRequestDTO) {
+        return ResponseEntity.ok(authService.signOut(signOutRequestDTO));
+    }
 }
