@@ -1,12 +1,14 @@
 package com.aman.Velora.auth_service.service.impl;
 
 import com.aman.Velora.auth_service.dto.request.*;
-import com.aman.Velora.auth_service.dto.response.AuthResponseDTO;
-import com.aman.Velora.auth_service.dto.response.ForgotPasswordResponseDTO;
-import com.aman.Velora.auth_service.dto.response.SignupResponseDTO;
-import com.aman.Velora.auth_service.dto.response.VerifyOTPResponseDTO;
+import com.aman.Velora.auth_service.dto.response.*;
 import com.aman.Velora.auth_service.exception.EmailNotVerifiedException;
+import com.aman.Velora.auth_service.exception.RefreshTokenExpiredException;
+import com.aman.Velora.auth_service.exception.RefreshTokenNotFoundException;
 import com.aman.Velora.auth_service.models.OtpPurpose;
+import com.aman.Velora.auth_service.models.RefreshToken;
+import com.aman.Velora.auth_service.repository.OtpVerificationRepository;
+import com.aman.Velora.auth_service.repository.RefreshTokenRepository;
 import com.aman.Velora.auth_service.service.AuthService;
 import com.aman.Velora.auth_service.service.JwtService;
 import com.aman.Velora.auth_service.service.OtpService;
@@ -22,9 +24,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+
 @Service
 @Slf4j
 public class AuthServiceImpl implements AuthService {
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final OtpVerificationRepository otpVerificationRepository;
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
@@ -37,13 +43,16 @@ public class AuthServiceImpl implements AuthService {
             RoleRepository roleRepository,
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
-            OtpServiceImpl otpService
-    ) {
+            OtpServiceImpl otpService,
+            OtpVerificationRepository otpVerificationRepository,
+            RefreshTokenRepository refreshTokenRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.otpService = otpService;
+        this.otpVerificationRepository = otpVerificationRepository;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
 
@@ -89,14 +98,15 @@ public class AuthServiceImpl implements AuthService {
         if (!user.isEmailVerified()) throw new EmailNotVerifiedException("Please verify your email before logging in.");
 
         String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user).getToken();
 
         log.info("User Logged in: {}", user.getEmail());
 
         return AuthResponseDTO.builder()
                 .accessToken(accessToken)
-                .refreshToken("in-progress")
+                .refreshToken(refreshToken)
                 .tokenType("bearer")
-                .expiresIn(1231231)
+                .expiresIn(jwtService.getExpirationTime())
                 .build();
     }
 
@@ -152,6 +162,42 @@ public class AuthServiceImpl implements AuthService {
 
         return ForgotPasswordResponseDTO.builder()
                 .message("Password reset successfully. You can now log in with your new password.")
+                .build();
+    }
+
+    @Override
+    public ResendOTPResponseDTO resendOtp(ResendOTPRequestDTO resendOTPRequestDTO) {
+        User user = userRepository.findByEmail(resendOTPRequestDTO.getEmail().trim())
+                .orElseThrow(InvalidCredentialsException::new);
+
+        otpService.generateAndSendOtp(user, OtpPurpose.EMAIL_VERIFICATION);
+
+        return ResendOTPResponseDTO.builder()
+                .message("OTP resent successfully.")
+                .build();
+    }
+
+    @Override
+    public RefreshTokenResponseDTO refreshToken(RefreshTokenRequestDTO refreshTokenRequestDTO) {
+        RefreshToken refreshToken = refreshTokenRepository.findByToken(refreshTokenRequestDTO.getRefreshToken())
+                .orElseThrow(() ->
+                        new RefreshTokenNotFoundException("Refresh token not found. Please log in again.")
+                );
+
+        if (refreshToken.getExpiresAt().isBefore(Instant.now()))
+            throw new RefreshTokenExpiredException("Refresh token is invalid or expired. Please log in again.");
+
+        if (refreshToken.isRevoked())
+            throw new RefreshTokenExpiredException("Refresh token is invalid or expired. Please log in again.");
+
+        User user = refreshToken.getUser();
+
+        String accessToken = jwtService.generateToken(user);
+
+        return RefreshTokenResponseDTO.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken.getToken())
+                .expiresIn(jwtService.getExpirationTime())
                 .build();
     }
 
