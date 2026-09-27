@@ -49,6 +49,19 @@ public class GlobalExceptionHandler {
                 );
     }
 
+    @ExceptionHandler(EmailAlreadyVerifiedException.class)
+    public ResponseEntity<ErrorResponse> handleEmailAlreadyVerified(EmailAlreadyVerifiedException exception) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(
+                        ErrorResponse.builder()
+                                .timestamp(Instant.now())
+                                .status(HttpStatus.BAD_REQUEST.value())
+                                .message(exception.getMessage())
+                                .code("EMAIL_ALREADY_VERIFIED")
+                                .build()
+                );
+    }
+
     @ExceptionHandler(InvalidOtpException.class)
     public ResponseEntity<ErrorResponse> handleInvalidOtp(InvalidOtpException exception) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

@@ -13,4 +13,8 @@ public interface OtpService {
     void sendOtpEmail(String toEmail, String otpCode, OtpPurpose purpose);
 
     void verifyOtp(String email, String otpCode, OtpPurpose purpose);
+
+    void sendVerificationSuccessEmail(String email);
+
+    void verifyEmailSuccessfully(String email);
 }

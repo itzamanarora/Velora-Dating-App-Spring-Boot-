@@ -1,11 +1,14 @@
 package com.aman.Velora.auth_service.service.impl;
 
+import com.aman.Velora.auth_service.exception.EmailAlreadyVerifiedException;
 import com.aman.Velora.auth_service.exception.InvalidOtpException;
 import com.aman.Velora.auth_service.models.OtpPurpose;
 import com.aman.Velora.auth_service.models.OtpVerification;
 import com.aman.Velora.auth_service.repository.OtpVerificationRepository;
 import com.aman.Velora.auth_service.service.OtpService;
+import com.aman.Velora.user_service.exception.user.UserNotFoundException;
 import com.aman.Velora.user_service.models.User;
+import com.aman.Velora.user_service.repository.UserRepository;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -26,9 +29,9 @@ import java.time.temporal.ChronoUnit;
 @Service
 @RequiredArgsConstructor
 public class OtpServiceImpl implements OtpService {
-
     private static final int OTP_LENGTH = 6;
     private static final int EXPIRY_MINUTES = 10;
+    private final UserRepository userRepository;
     private final JavaMailSender mailSender;
     private final TemplateEngine templateEngine;
     private final OtpVerificationRepository otpVerificationRepository;
@@ -106,5 +109,51 @@ public class OtpServiceImpl implements OtpService {
         otpVerification.setUsed(true);
         log.info("OTP is verified: {}", otpVerification.getId());
         otpVerificationRepository.save(otpVerification);
+    }
+
+    @Override
+    public void sendVerificationSuccessEmail(String email) {
+        try {
+            Context context = new Context();
+            context.setVariable("message",
+                    "Your email has been successfully verified. Welcome to Velora!");
+            context.setVariable("userEmail", email);
+            context.setVariable("appUrl", "https://velora.app");
+
+            String htmlBody = templateEngine.process("email-success", context);
+
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(MAIL_FROM);
+            helper.setTo(email);
+            helper.setSubject("Welcome to Velora! 🎉");
+            helper.setText(htmlBody, true);
+
+            mailSender.send(mimeMessage);
+
+        } catch (MessagingException e) {
+            log.error("Failed to send success email to: {}", email, e);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void verifyEmailSuccessfully(String email) {
+        log.info("Email verified successfully for: {}", email);
+        User user = userRepository.findByEmail(email).orElseThrow(() ->
+                new UserNotFoundException("User not found with email: " + email));
+
+        if (user.isEmailVerified()) {
+            log.info("Email is already verified for user: {}", email);
+            throw new EmailAlreadyVerifiedException("Email is already verified for user: " + email);
+        }
+
+        user.setEmailVerified(true);
+        user.setUpdatedAt(Instant.now());
+        userRepository.save(user);
+
+        sendVerificationSuccessEmail(email);
+
+        log.info("Email verification process completed for user: {}", email);
     }
 }
