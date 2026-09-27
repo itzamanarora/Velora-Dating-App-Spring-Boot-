@@ -122,6 +122,7 @@ public class AuthServiceImpl implements AuthService {
                 .orElseThrow(InvalidCredentialsException::new);
         user.setEmailVerified(true);
         userRepository.save(user);
+        otpService.verifyEmailSuccessfully(user.getEmail());
 
         log.info("Email verified successfully for: {}", user.getEmail());
 

@@ -46,7 +46,7 @@ public class Profile {
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
-    @Column(name = "profile_picture_url", length = 2048)
+    @Column(name = "profile_picture_url", columnDefinition = "TEXT")
     private String profilePictureUrl;
 
     @CreationTimestamp

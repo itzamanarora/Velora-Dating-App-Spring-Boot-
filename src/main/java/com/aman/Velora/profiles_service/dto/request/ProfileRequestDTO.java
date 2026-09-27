@@ -25,6 +25,5 @@ public class ProfileRequestDTO {
     private String gender;
 
     @NotBlank(message = "Profile picture URL is required")
-    @Size(max = 2048, message = "Profile picture URL must not exceed 2048 characters")
     private String profilePictureUrl;
 }
