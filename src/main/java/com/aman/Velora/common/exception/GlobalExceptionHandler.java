@@ -1,6 +1,7 @@
 package com.aman.Velora.common.exception;
 
 import com.aman.Velora.auth_service.exception.*;
+import com.aman.Velora.profiles_service.exception.ProfileNotFoundException;
 import com.aman.Velora.user_service.exception.role.RoleAlreadyInactiveException;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
 import com.aman.Velora.user_service.exception.user.UserAlreadyExistsException;
@@ -183,6 +184,20 @@ public class GlobalExceptionHandler {
                                 .status(HttpStatus.BAD_REQUEST.value())
                                 .message(exception.getMessage())
                                 .code("BAD_REQUEST")
+                                .build()
+                );
+    }
+
+    /// Profile Exceptions
+    @ExceptionHandler(ProfileNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleProfileNotFound(ProfileNotFoundException exception) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(
+                        ErrorResponse.builder()
+                                .timestamp(Instant.now())
+                                .status(HttpStatus.NOT_FOUND.value())
+                                .message(exception.getMessage())
+                                .code("PROFILE_NOT_FOUND")
                                 .build()
                 );
     }
