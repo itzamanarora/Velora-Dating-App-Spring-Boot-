@@ -120,8 +120,7 @@ public class AuthServiceImpl implements AuthService {
 
         User user = userRepository.findByEmail(verifyOTPRequestDTO.getEmail().trim())
                 .orElseThrow(InvalidCredentialsException::new);
-        user.setEmailVerified(true);
-        userRepository.save(user);
+
         otpService.verifyEmailSuccessfully(user.getEmail());
 
         log.info("Email verified successfully for: {}", user.getEmail());
