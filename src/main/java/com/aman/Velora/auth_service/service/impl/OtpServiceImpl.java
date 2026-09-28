@@ -120,7 +120,7 @@ public class OtpServiceImpl implements OtpService {
             context.setVariable("userEmail", email);
             context.setVariable("appUrl", "https://velora.app");
 
-            String htmlBody = templateEngine.process("email-success", context);
+            String htmlBody = templateEngine.process("verify-email-success", context);
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
