@@ -18,6 +18,8 @@ public class ProfileDTOMapper {
                 .dateOfBirth(profile.getDateOfBirth().toString())
                 .gender(profile.getGender())
                 .profilePictureUrl(profile.getProfilePictureUrl())
+                .preferredGender(profile.getPreferredGender())
+                .bio(profile.getBio())
                 .createdAt(profile.getCreatedAt())
                 .build();
     }
@@ -29,6 +31,8 @@ public class ProfileDTOMapper {
                 .dateOfBirth(LocalDate.parse(profileRequestDTO.getDateOfBirth()))
                 .gender(Gender.valueOf(profileRequestDTO.getGender()))
                 .profilePictureUrl(profileRequestDTO.getProfilePictureUrl())
+                .preferredGender(Gender.valueOf(profileRequestDTO.getPreferredGender()))
+                .bio(profileRequestDTO.getBio())
                 .build();
     }
 }

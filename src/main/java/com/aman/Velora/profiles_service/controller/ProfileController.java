@@ -49,7 +49,7 @@ public class ProfileController {
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "lastActiveAt") String sortBy,
             @RequestParam(required = false) String search
     ) {
         String token = authorizationHeader.replace("Bearer ", "");

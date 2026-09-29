@@ -18,6 +18,8 @@ public class ProfileResponseDTO {
     private String lastName;
     private String dateOfBirth;
     private Gender gender;
+    private String bio;
+    private Gender preferredGender;
     private String profilePictureUrl;
     private Instant createdAt;
 }

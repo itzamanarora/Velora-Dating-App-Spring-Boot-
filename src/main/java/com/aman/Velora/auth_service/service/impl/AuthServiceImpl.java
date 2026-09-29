@@ -13,6 +13,8 @@ import com.aman.Velora.auth_service.service.AuthService;
 import com.aman.Velora.auth_service.service.JwtService;
 import com.aman.Velora.auth_service.service.OtpService;
 import com.aman.Velora.auth_service.exception.InvalidCredentialsException;
+import com.aman.Velora.profiles_service.models.Profile;
+import com.aman.Velora.profiles_service.repository.ProfileRepository;
 import com.aman.Velora.user_service.exception.role.RoleNotFoundException;
 import com.aman.Velora.user_service.exception.user.UserAlreadyExistsException;
 import com.aman.Velora.user_service.models.Role;
@@ -32,6 +34,7 @@ public class AuthServiceImpl implements AuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final ProfileRepository profileRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final OtpService otpService;
@@ -42,13 +45,15 @@ public class AuthServiceImpl implements AuthService {
             PasswordEncoder passwordEncoder,
             JwtService jwtService,
             OtpServiceImpl otpService,
-            RefreshTokenRepository refreshTokenRepository) {
+            RefreshTokenRepository refreshTokenRepository,
+            ProfileRepository profileRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.otpService = otpService;
         this.refreshTokenRepository = refreshTokenRepository;
+        this.profileRepository = profileRepository;
     }
 
 
@@ -84,6 +89,7 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
+    @Transactional
     public AuthResponseDTO login(LoginRequestDTO loginRequestDTO) {
         log.info("Login attempt for email: {}", loginRequestDTO.getEmail().trim());
 
@@ -97,6 +103,10 @@ public class AuthServiceImpl implements AuthService {
 
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user).getToken();
+
+        Profile profile = profileRepository.findByUserId(user.getId()).orElseThrow(null);
+        profile.setLastActiveAt(Instant.now());
+        profileRepository.save(profile);
 
         log.info("User Logged in: {}", user.getEmail());
 
