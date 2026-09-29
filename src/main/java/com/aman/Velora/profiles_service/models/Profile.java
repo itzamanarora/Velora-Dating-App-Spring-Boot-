@@ -52,7 +52,7 @@ public class Profile {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @Column(name = "preferred_gender", nullable = false)
+    @Column(name = "preferred_gender", nullable = false, length = 75)
     @Enumerated(EnumType.STRING)
     private Gender preferredGender;
 

@@ -104,9 +104,11 @@ public class AuthServiceImpl implements AuthService {
         String accessToken = jwtService.generateToken(user);
         String refreshToken = jwtService.generateRefreshToken(user).getToken();
 
-        Profile profile = profileRepository.findByUserId(user.getId()).orElseThrow(null);
-        profile.setLastActiveAt(Instant.now());
-        profileRepository.save(profile);
+        Profile profile = profileRepository.findByUserId(user.getId()).orElse(null);
+        if (profile != null) {
+            profile.setLastActiveAt(Instant.now());
+            profileRepository.save(profile);
+        }
 
         log.info("User Logged in: {}", user.getEmail());
 
