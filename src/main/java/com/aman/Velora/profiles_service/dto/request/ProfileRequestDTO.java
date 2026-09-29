@@ -24,6 +24,12 @@ public class ProfileRequestDTO {
     @NotBlank(message = "Gender is required")
     private String gender;
 
+    @Size(max = 500, message = "Bio must be at most 500 characters")
+    private String bio;
+
+    @NotBlank(message = "Preferred gender is required")
+    private String preferredGender;
+
     @NotBlank(message = "Profile picture URL is required")
     private String profilePictureUrl;
 }

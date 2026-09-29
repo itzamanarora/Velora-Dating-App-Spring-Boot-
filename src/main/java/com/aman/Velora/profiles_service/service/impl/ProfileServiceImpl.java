@@ -16,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -45,7 +46,7 @@ public class ProfileServiceImpl implements ProfileService {
 
         Profile profile = ProfileDTOMapper.mapToProfile(profileRequestDTO);
         profile.setUserId(userId);
-
+        profile.setLastActiveAt(Instant.now());
         Profile savedProfile = profileRepository.save(profile);
 
         log.info("Profile created: {}", savedProfile.getFirstName() + " " + savedProfile.getLastName());

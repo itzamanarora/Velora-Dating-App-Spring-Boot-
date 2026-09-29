@@ -49,6 +49,16 @@ public class Profile {
     @Column(name = "profile_picture_url", columnDefinition = "TEXT")
     private String profilePictureUrl;
 
+    @Column(columnDefinition = "TEXT")
+    private String bio;
+
+    @Column(name = "preferred_gender", nullable = false, length = 75)
+    @Enumerated(EnumType.STRING)
+    private Gender preferredGender;
+
+    @Column(name = "last_active_at", nullable = false)
+    private Instant lastActiveAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
