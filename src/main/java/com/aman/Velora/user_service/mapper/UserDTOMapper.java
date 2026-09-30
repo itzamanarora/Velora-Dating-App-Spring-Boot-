@@ -1,7 +1,7 @@
 package com.aman.Velora.user_service.mapper;
 
-import com.aman.Velora.user_service.dto.user.UserRequestDTO;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
+import com.aman.Velora.user_service.dto.request.UserRequestDTO;
+import com.aman.Velora.user_service.dto.response.UserResponseDTO;
 import com.aman.Velora.user_service.models.User;
 
 public class UserDTOMapper {

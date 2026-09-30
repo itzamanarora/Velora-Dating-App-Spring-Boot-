@@ -1,4 +1,4 @@
-package com.aman.Velora.user_service.dto.page;
+package com.aman.Velora.user_service.dto.response;
 
 import lombok.*;
 

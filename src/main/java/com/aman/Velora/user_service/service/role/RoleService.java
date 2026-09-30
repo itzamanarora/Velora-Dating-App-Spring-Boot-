@@ -1,8 +1,8 @@
 package com.aman.Velora.user_service.service.role;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
-import com.aman.Velora.user_service.dto.role.RoleRequestDTO;
-import com.aman.Velora.user_service.dto.role.RoleResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
+import com.aman.Velora.user_service.dto.request.RoleRequestDTO;
+import com.aman.Velora.user_service.dto.response.RoleResponseDTO;
 
 import java.util.UUID;
 

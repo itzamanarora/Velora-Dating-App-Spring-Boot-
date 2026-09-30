@@ -1,7 +1,7 @@
 package com.aman.Velora.user_service.controller;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
+import com.aman.Velora.user_service.dto.response.UserResponseDTO;
 import com.aman.Velora.user_service.service.user.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;

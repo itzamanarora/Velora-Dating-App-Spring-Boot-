@@ -1,8 +1,8 @@
 package com.aman.Velora.user_service.controller;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
-import com.aman.Velora.user_service.dto.role.RoleRequestDTO;
-import com.aman.Velora.user_service.dto.role.RoleResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
+import com.aman.Velora.user_service.dto.request.RoleRequestDTO;
+import com.aman.Velora.user_service.dto.response.RoleResponseDTO;
 import com.aman.Velora.user_service.service.role.RoleService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

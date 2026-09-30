@@ -5,11 +5,10 @@ import com.aman.Velora.profiles_service.dto.request.ProfileRequestDTO;
 import com.aman.Velora.profiles_service.dto.response.ProfileResponseDTO;
 import com.aman.Velora.profiles_service.models.Gender;
 import com.aman.Velora.profiles_service.service.ProfileService;
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
