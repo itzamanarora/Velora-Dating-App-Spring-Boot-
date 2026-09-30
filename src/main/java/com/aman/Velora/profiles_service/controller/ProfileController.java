@@ -3,6 +3,7 @@ package com.aman.Velora.profiles_service.controller;
 import com.aman.Velora.auth_service.service.JwtService;
 import com.aman.Velora.profiles_service.dto.request.ProfileRequestDTO;
 import com.aman.Velora.profiles_service.dto.response.ProfileResponseDTO;
+import com.aman.Velora.profiles_service.models.Gender;
 import com.aman.Velora.profiles_service.service.ProfileService;
 import com.aman.Velora.user_service.dto.page.PageResponseDTO;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -47,6 +48,7 @@ public class ProfileController {
     @GetMapping
     public ResponseEntity<PageResponseDTO<ProfileResponseDTO>> getAllProfiles(
             @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(defaultValue = "OTHER") Gender genderPreferred,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "lastActiveAt") String sortBy,
@@ -54,6 +56,6 @@ public class ProfileController {
     ) {
         String token = authorizationHeader.replace("Bearer ", "");
         UUID userId = jwtService.extractUserId(token);
-        return ResponseEntity.ok(profileService.getAllProfiles(userId, page, pageSize, sortBy, search));
+        return ResponseEntity.ok(profileService.getAllProfiles(userId, genderPreferred, page, pageSize, sortBy, search));
     }
 }
