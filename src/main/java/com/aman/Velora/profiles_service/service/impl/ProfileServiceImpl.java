@@ -4,6 +4,7 @@ import com.aman.Velora.profiles_service.dto.request.ProfileRequestDTO;
 import com.aman.Velora.profiles_service.dto.response.ProfileResponseDTO;
 import com.aman.Velora.profiles_service.exception.ProfileNotFoundException;
 import com.aman.Velora.profiles_service.mapper.ProfileDTOMapper;
+import com.aman.Velora.profiles_service.models.Gender;
 import com.aman.Velora.profiles_service.models.Profile;
 import com.aman.Velora.profiles_service.repository.ProfileRepository;
 import com.aman.Velora.profiles_service.service.ProfileService;
@@ -55,12 +56,15 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public PageResponseDTO<ProfileResponseDTO> getAllProfiles(UUID userId, int page, int pageSize, String sortBy, String sortDir) {
-        log.info("Fetching all profiles for userId: {}", userId);
+    public PageResponseDTO<ProfileResponseDTO> getAllProfiles(UUID userId, Gender genderPreferred, int page, int pageSize, String sortBy, String sortDir) {
+        log.info("Fetching all profiles for userId: {} with preferred gender: {}", userId, genderPreferred);
 
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by(sortBy).descending());
 
-        Page<ProfileResponseDTO> profilePage = profileRepository.findAllByUserIdNot(userId, pageable).map(ProfileDTOMapper::mapToProfileResponseDTO);
+        Page<ProfileResponseDTO> profilePage =
+                profileRepository.
+                        findAllByUserIdNotAndGender(userId, genderPreferred, pageable)
+                        .map(ProfileDTOMapper::mapToProfileResponseDTO);
 
         return PageDTOMapper.mapToPageResponse(profilePage);
     }

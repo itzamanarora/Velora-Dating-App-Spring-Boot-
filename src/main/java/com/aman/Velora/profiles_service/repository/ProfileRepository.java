@@ -1,5 +1,6 @@
 package com.aman.Velora.profiles_service.repository;
 
+import com.aman.Velora.profiles_service.models.Gender;
 import com.aman.Velora.profiles_service.models.Profile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,11 +14,10 @@ import java.util.UUID;
 public interface ProfileRepository extends JpaRepository<Profile, UUID> {
     Optional<Profile> findByUserId(UUID userId);
 
-    Page<Profile> findAllByUserId(UUID userId, Pageable pageable);
-
     Page<Profile> findAll(Pageable pageable);
 
     Page<Profile> findAllByUserIdNot(UUID userId, Pageable pageable);
 
-//    Optional<Profile> findByUserId(UUID userId);
+    Page<Profile> findAllByUserIdNotAndGender(UUID userId, Gender gender, Pageable pageable);
+
 }
