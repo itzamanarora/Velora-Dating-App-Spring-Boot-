@@ -1,6 +1,6 @@
 package com.aman.Velora.user_service.mapper;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
 import org.springframework.data.domain.Page;
 
 public class PageDTOMapper {

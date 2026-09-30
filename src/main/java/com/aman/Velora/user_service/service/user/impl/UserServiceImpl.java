@@ -1,8 +1,8 @@
 package com.aman.Velora.user_service.service.user.impl;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
-import com.aman.Velora.user_service.dto.user.UserRequestDTO;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
+import com.aman.Velora.user_service.dto.request.UserRequestDTO;
+import com.aman.Velora.user_service.dto.response.UserResponseDTO;
 import com.aman.Velora.user_service.exception.user.UserNotFoundException;
 import com.aman.Velora.user_service.mapper.PageDTOMapper;
 import com.aman.Velora.user_service.mapper.UserDTOMapper;

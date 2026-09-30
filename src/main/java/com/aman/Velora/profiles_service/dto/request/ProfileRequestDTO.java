@@ -1,6 +1,5 @@
 package com.aman.Velora.profiles_service.dto.request;
 
-import com.aman.Velora.profiles_service.models.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;

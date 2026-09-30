@@ -1,6 +1,5 @@
-package com.aman.Velora.user_service.dto.user;
+package com.aman.Velora.user_service.dto.response;
 
-import com.aman.Velora.user_service.dto.role.RoleResponseDTO;
 import lombok.*;
 
 import java.time.Instant;

@@ -16,8 +16,8 @@ public interface ProfileRepository extends JpaRepository<Profile, UUID> {
 
     Page<Profile> findAll(Pageable pageable);
 
-    Page<Profile> findAllByUserIdNot(UUID userId, Pageable pageable);
-
     Page<Profile> findAllByUserIdNotAndGender(UUID userId, Gender gender, Pageable pageable);
+
+    boolean existsByUserId(UUID userId);
 
 }

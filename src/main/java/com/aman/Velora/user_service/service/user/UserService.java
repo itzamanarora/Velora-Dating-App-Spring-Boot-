@@ -1,8 +1,8 @@
 package com.aman.Velora.user_service.service.user;
 
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
-import com.aman.Velora.user_service.dto.user.UserRequestDTO;
-import com.aman.Velora.user_service.dto.user.UserResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
+import com.aman.Velora.user_service.dto.request.UserRequestDTO;
+import com.aman.Velora.user_service.dto.response.UserResponseDTO;
 
 import java.util.UUID;
 

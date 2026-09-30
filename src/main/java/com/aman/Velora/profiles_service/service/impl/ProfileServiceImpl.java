@@ -8,7 +8,7 @@ import com.aman.Velora.profiles_service.models.Gender;
 import com.aman.Velora.profiles_service.models.Profile;
 import com.aman.Velora.profiles_service.repository.ProfileRepository;
 import com.aman.Velora.profiles_service.service.ProfileService;
-import com.aman.Velora.user_service.dto.page.PageResponseDTO;
+import com.aman.Velora.user_service.dto.response.PageResponseDTO;
 import com.aman.Velora.user_service.mapper.PageDTOMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
